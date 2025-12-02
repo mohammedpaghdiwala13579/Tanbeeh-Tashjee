@@ -5,71 +5,130 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Teacher Portal — Tanbeeh & Tashjeeh</title>
 <style>
-  body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);min-height:100vh;margin:0;padding:20px;color:#333}
-  .wrap{max-width:1100px;margin:30px auto;background:rgba(255,255,255,0.97);padding:30px;border-radius:20px;box-shadow:0 20px 70px rgba(0,0,0,0.2);backdrop-filter:blur(12px)}
-  h1{margin:0 0 20px;font-size:30px;text-align:center;background:linear-gradient(90deg,#0f63a8,#1f8feb);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:end;margin-bottom:20px}
-  label{display:block;font-weight:600;margin-bottom:8px;color:#1f8feb}
-  select,input,button{padding:12px 14px;border-radius:12px;border:1px solid #d0e0ff;font-size:15px;transition:all .3s}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);min-height:100vh;margin:0;padding:15px;color:#333;box-sizing:border-box}
+  .wrap{max-width:1100px;margin:20px auto;background:rgba(255,255,255,0.97);padding:20px;border-radius:20px;box-shadow:0 20px 70px rgba(0,0,0,0.2);backdrop-filter:blur(12px)}
+  h1{margin:0 0 20px;font-size:28px;text-align:center;background:linear-gradient(90deg,#0f63a8,#1f8feb);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  
+  /* Responsive container for form */
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+  }
+  .form-group {
+    flex: 1;
+    min-width: 280px;
+  }
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  label{display:block;font-weight:600;margin-bottom:8px;color:#1f8feb;font-size:14px}
+  select,input,button{padding:12px 14px;border-radius:12px;border:1px solid #d0e0ff;font-size:15px;transition:all .3s;width:100%;box-sizing:border-box}
   select:focus,input:focus{outline:none;border-color:#1f8feb;box-shadow:0 0 0 3px rgba(31,143,235,0.2)}
-  input{width:100%;box-sizing:border-box}
-  button{cursor:pointer;border:0;background:#1f8feb;color:white;font-weight:600;box-shadow:0 4px 15px rgba(31,143,235,0.3)}
+  button{cursor:pointer;border:0;background:#1f8feb;color:white;font-weight:600;box-shadow:0 4px 15px rgba(31,143,235,0.3);min-width:120px}
   button:hover{background:#0d6efd;transform:translateY(-2px)}
   button.danger{background:#e04b4b;box-shadow:0 4px 15px rgba(224,75,75,0.3)}
   button.danger:hover{background:#c82333}
-  button.small{padding:8px 14px;font-size:14px}
-  table{width:100%;border-collapse:separate;border-spacing:0;margin-top:20px;border-radius:16px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,0.12)}
-  th{background:linear-gradient(90deg,#0f63a8,#1f8feb);color:white;padding:18px;font-weight:600;text-transform:uppercase;font-size:14px}
-  td{padding:16px;background:#fdfdff;text-align:center}
+  button.small{padding:8px 14px;font-size:14px;min-width:auto}
+
+  /* Table responsive wrapper */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    margin-top: 20px;
+  }
+  table{width:100%;min-width:700px;border-collapse:separate;border-spacing:0}
+  th{background:linear-gradient(90deg,#0f63a8,#1f8feb);color:white;padding:14px 12px;font-weight:600;text-transform:uppercase;font-size:13px;white-space:nowrap}
+  td{padding:12px 10px;background:#fdfdff;text-align:center;font-size:14px}
   tr:hover td{background:#f0f8ff}
   .tan{background:#ffebee!important;color:#c62828;font-weight:700}
   .tash{background:#e8f5e9!important;color:#2e7d32;font-weight:700}
-  .msg{padding:14px;border-radius:12px;margin:12px 0;font-weight:600}
+
+  /* Name column - allow wrapping on mobile */
+  td:nth-child(2), th:nth-child(2) {
+    text-align:left;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 180px;
+  }
+
+  .msg{padding:14px;border-radius:12px;margin:12px 0;font-weight:600;font-size:14px}
   .success{background:#e6ffed;border:2px solid #b6f0c8;color:#2e7d32}
   .warn{background:#fff3e6;border:2px solid #ffd0a8;color:#e65100}
+
   .history-section{margin-top:40px}
   .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:15px}
   .history-section h2{font-size:22px;margin:0;background:linear-gradient(90deg,#1f8feb,#0f63a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .history-table{font-size:14px}
-  .history-table th{background:#34495e;color:#ecf0f1}
-  .history-table td{padding:10px 12px;font-size:13.5px}
+  .history-table{font-size:14px;min-width:800px}
+  .history-table th{background:#34495e;color:#ecf0f1;padding:10px}
+  .history-table td{padding:10px;font-size:13px}
   .log-tanbeeh{background:#ffebee;color:#c62828}
   .log-tashjeeh{background:#e8f5e9;color:#2e7d32}
   .teacher-name{font-weight:600;color:#1f8feb}
   .timestamp{color:#777;font-size:12px}
+
+  /* Extra small screens */
+  @media (max-width: 480px) {
+    .wrap{padding:15px}
+    h1{font-size:24px}
+    .btn-group{flex-direction:column;align-items:stretch}
+    button.small{width:100%}
+    td, th{font-size:13px;padding:10px 6px}
+    td:nth-child(2), th:nth-child(2) {max-width:120px}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <div style="text-align:center;margin-bottom:10px">
+    <a href="https://imgbb.com/"><img src="https://i.ibb.co/Ndqj258K/panchgani-removebg-preview.png" width="80" height="80" alt="logo" border="0"></a>
+  </div>
   <h1>Teacher Portal — Tanbeeh & Tashjeeh</h1>
 
-  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px">
-    <div class="row" style="flex:1">
-      <div style="min-width:240px"><label>Student</label><select id="studentNo" style="width:100%"></select></div>
-      <div style="min-width:200px"><label>Type</label>
+  <div class="form-container">
+    <div class="row">
+      <div class="form-group"><label>Student</label><select id="studentNo"></select></div>
+      <div class="form-group"><label>Type</label>
         <select id="type">
           <option value="Tanbeeh">Tanbeeh (Warning)</option>
           <option value="Tashjeeh">Tashjeeh (Appreciation)</option>
         </select>
       </div>
-      <div style="flex:1;min-width:300px"><label>Reason</label><select id="item" style="width:100%"></select></div>
-      <div style="min-width:180px"><label>Teacher Name</label><input type="text" id="teacherName" placeholder="Enter your name" required /></div>
-      <div style="align-self:end">
+      <div class="form-group"><label>Reason</label><select id="item"></select></div>
+      <div class="form-group"><label>Teacher Name</label><input type="text" id="teacherName" placeholder="Enter your name" required /></div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div class="btn-group">
         <button id="addPts">Add Points</button>
         <button id="resetStudent" class="danger small">Reset Student</button>
       </div>
+      <button id="showParentBtn" class="small">Open Live Parent Portal</button>
     </div>
-    <div><button id="showParentBtn" class="small">Open Live Parent Portal</button></div>
   </div>
 
   <div id="message"></div>
 
-  <table id="pointsTable">
-    <thead>
-      <tr><th>No.</th><th>Name</th><th class="tan">Tanbeeh</th><th class="tash">Tashjee</th><th>Total</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-wrapper">
+    <table id="pointsTable">
+      <thead>
+        <tr><th>No.</th><th>Name</th><th class="tan">Tanbeeh</th><th class="tash">Tashjee</th><th>Total</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <!-- Activity History Log -->
   <div class="history-section">
@@ -77,19 +136,21 @@
       <h2>Activity Log</h2>
       <button id="clearHistoryBtn" class="danger small">Clear All Log</button>
     </div>
-    <table class="history-table" id="historyTable">
-      <thead>
-        <tr>
-          <th>Date & Time</th>
-          <th>Student</th>
-          <th>Type</th>
-          <th>Reason</th>
-          <th>Points</th>
-          <th>Added By</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="history-table" id="historyTable">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Student</th>
+            <th>Type</th>
+            <th>Reason</th>
+            <th>Points</th>
+            <th>Added By</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -218,7 +279,7 @@ addBtn.addEventListener('click', ()=>{
   addLogEntry(studentId, type, reasonText, pts, teacher);
   renderTable();
   showMsg(`${pts} pts (${type}) added to ${studentNames[studentId]} by ${teacher}`);
-  syncToGoogleSheets();  // LIVE SYNC
+  syncToGoogleSheets();
 
   teacherNameInput.value = '';
   itemSelect.value = '';
@@ -233,7 +294,7 @@ resetStudentBtn.addEventListener('click', ()=>{
   localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
   renderTable();
   showMsg(`${studentNames[idx]} points reset`, 'warn');
-  syncToGoogleSheets();  // LIVE SYNC
+  syncToGoogleSheets();
 });
 
 // Clear History
@@ -255,7 +316,7 @@ populateStudents();
 updateItems();
 renderTable();
 renderHistory();
-syncToGoogleSheets(); // Initial sync on load
+syncToGoogleSheets();
 </script>
 </body>
 </html>
