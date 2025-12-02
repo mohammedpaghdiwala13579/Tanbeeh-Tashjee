@@ -30,7 +30,6 @@
 
   .container { max-width: 1100px; margin: 0 auto; }
 
-  /* Header with Logo + Title Side by Side */
   .header {
     display: flex;
     align-items: center;
@@ -52,10 +51,7 @@
     padding: 5px;
   }
 
-  .title-group {
-    text-align: center;
-  }
-
+  .title-group { text-align: center; }
   h1 {
     font-size: 30px;
     background: linear-gradient(90deg, #4facfe, #00f2fe);
@@ -65,13 +61,7 @@
     margin: 0;
     line-height: 1.2;
   }
-
-  .subtitle {
-    color: rgba(255,255,255,0.95);
-    font-size: 15px;
-    font-weight: 500;
-    margin-top: 4px;
-  }
+  .subtitle { color: rgba(255,255,255,0.95); font-size: 15px; font-weight: 500; margin-top: 4px; }
 
   .card {
     background: rgba(255,255,255,0.98);
@@ -84,7 +74,6 @@
     animation: fadeInUp 0.8s ease;
   }
 
-  /* Rest of your styles remain exactly the same (only header changed) */
   .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -92,14 +81,7 @@
     margin-bottom: 20px;
   }
 
-  label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--primary);
-    font-size: 15px;
-  }
-
+  label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--primary); font-size: 15px; }
   select, input {
     width: 100%;
     padding: 14px 16px;
@@ -109,7 +91,6 @@
     background: white;
     transition: all 0.3s ease;
   }
-
   select:focus, input:focus {
     outline: none;
     border-color: var(--primary);
@@ -117,13 +98,7 @@
     transform: translateY(-2px);
   }
 
-  .btn-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 10px;
-  }
-
+  .btn-group { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
   button {
     padding: 14px 20px;
     border: none;
@@ -135,25 +110,16 @@
     box-shadow: 0 6px 20px rgba(0,0,0,0.1);
     min-width: 140px;
   }
-
   .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
   .btn-danger { background: linear-gradient(135deg, #e04b4b, #c82333); color: white; }
   .btn-secondary { background: #64748b; color: white; padding: 12px 18px; font-size: 14px; }
-
   button:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.2); }
 
   .message { padding: 16px 20px; border-radius: 16px; margin: 15px 0; font-weight: 600; font-size: 15px; animation: slideIn 0.5s ease; }
   .success { background: #e6ffed; border: 2px solid #b6f0c8; color: var(--success); }
   .warn { background: #fff3e6; border: 2px solid #ffd0a8; color: #e65100; }
 
-  .table-container {
-    overflow-x: auto;
-    border-radius: 20px;
-    box-shadow: var(--card-shadow);
-    margin-top: 10px;
-    background: white;
-  }
-
+  .table-container { overflow-x: auto; border-radius: 20px; box-shadow: var(--card-shadow); margin-top: 10px; background: white; }
   table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
   th {
     background: linear-gradient(90deg, var(--primary-dark), var(--primary));
@@ -163,7 +129,6 @@
     font-size: 13px;
     letter-spacing: 0.5px;
   }
-
   td { padding: 14px 10px; text-align: center; border-bottom: 1px solid #f0f4ff; }
   tr:hover td { background: #f5f9ff; }
   .tan { background: #ffebee !important; color: #c62828; font-weight: 700; }
@@ -178,7 +143,6 @@
     -webkit-text-fill-color: transparent;
     margin-bottom: 15px;
   }
-
   .history-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; }
   .log-tanbeeh { background: #ffebee; }
   .log-tashjeeh { background: #e8f5e9; }
@@ -202,8 +166,6 @@
 <body>
 
 <div class="container">
-
-  <!-- Updated Header: Logo + Title Side by Side -->
   <div class="header">
     <div class="logo">
       <img src="https://i.ibb.co/Ndqj258K/panchgani-removebg-preview.png" alt="Logo">
@@ -214,7 +176,6 @@
     </div>
   </div>
 
-  <!-- Rest of your content (unchanged) -->
   <div class="card">
     <div class="form-grid">
       <div class="form-group">
@@ -241,7 +202,8 @@
     <div class="btn-group">
       <button id="addPts" class="btn-primary">Add Points</button>
       <button id="resetStudent" class="btn-danger">Reset Student</button>
-      <button id="showParentBtn" class="btn-secondary">Live Parent Portal</button>
+      <button id="showParentBtn" class="btn-secondary">Live Parent Portal (Points)</button>
+      <button id="showLogBtn" class="btn-secondary">Live Activity Log</button>
     </div>
   </div>
 
@@ -274,11 +236,11 @@
   </div>
 </div>
 
-<!-- Your existing script (100% unchanged) -->
 <script>
-// [All your original JavaScript code here — exactly the same as before]
-// I’m keeping it identical for reliability:
-const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwc2PTgG3In70MsIwLeVkPgzxc5hsNhDwPxA5EcRbFms6cZ0Q0Bi6OHstNnzqiylRpy/exec";
+// ─────────────────────── URLs & Data ───────────────────────
+const POINTS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxNQGEGdAhJQT0satxJZA16EaRAtc344Jjz--fJFZoNITdc_f2sc8hO3B-rtobRs25OPQ/exec";
+const LOG_WEB_APP_URL    = "https://script.google.com/macros/s/AKfycbxNQGEGdAhJQT0satxJZA16EaRAtc344Jjz--fJFZoNITdc_f2sc8hO3B-rtobRs25OPQ/exec";
+
 const STORAGE_KEY = 'tanbeehTashjeehPoints_v2';
 const HISTORY_KEY = 'tanbeehTashjeehHistory_v2';
 
@@ -291,6 +253,7 @@ const tashjeehData = [{text:"Active participation in sports event (Weekly)",pts:
 let points = JSON.parse(localStorage.getItem(STORAGE_KEY)) || Array(studentNames.length).fill().map(()=>({tanbeeh:0,tashjeeh:0}));
 let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
 
+// Elements
 const studentSelect = document.getElementById('studentNo');
 const typeSelect = document.getElementById('type');
 const itemSelect = document.getElementById('item');
@@ -298,13 +261,18 @@ const teacherNameInput = document.getElementById('teacherName');
 const addBtn = document.getElementById('addPts');
 const resetStudentBtn = document.getElementById('resetStudent');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const showParentBtn = document.getElementById('showParentBtn');
+const showLogBtn = document.getElementById('showLogBtn');
 const messageDiv = document.getElementById('message');
 const tableBody = document.querySelector('#pointsTable tbody');
 const historyBody = document.querySelector('#historyTable tbody');
-const showParentBtn = document.getElementById('showParentBtn');
 
-function syncToGoogleSheets() {
-  fetch(SHEET_WEB_APP_URL, { method: 'POST', body: JSON.stringify(points), mode: 'no-cors', headers: { 'Content-Type': 'text/plain' } });
+// ─────────────────────── Functions ───────────────────────
+function syncPoints() {
+  fetch(POINTS_WEB_APP_URL, { method: 'POST', body: JSON.stringify(points), mode: 'no-cors', headers: {'Content-Type':'text/plain'} });
+}
+function syncLog(entry) {
+  fetch(LOG_WEB_APP_URL, { method: 'POST', body: JSON.stringify(entry), mode: 'no-cors', headers: {'Content-Type':'text/plain'} });
 }
 
 function populateStudents(){
@@ -341,7 +309,7 @@ function renderTable(){
 function renderHistory(){
   historyBody.innerHTML = '';
   if (history.length === 0) {
-    historyBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;padding:30px;font-size:15px;">No activity recorded yet</td></tr>';
+    historyBody.innerHTML = '<tr><td colspan="六年" style="text-align:center;color:#888;padding:30px;font-size:15px;">No activity recorded yet</td></tr>';
     return;
   }
   history.slice().reverse().forEach(log => {
@@ -366,6 +334,7 @@ function addLogEntry(studentId, type, reason, points, teacher) {
   renderHistory();
 }
 
+// ─────────────────────── Main Actions ───────────────────────
 addBtn.onclick = () => {
   const studentId = parseInt(studentSelect.value);
   const type = typeSelect.value;
@@ -386,9 +355,13 @@ addBtn.onclick = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
   addLogEntry(studentId, type, reasonText, pts, teacher);
   renderTable();
-  showMsg(`${pts} pts (${type}) added for ${studentNames[studentId].split(' ')[0]} by ${teacher}`);
-  syncToGoogleSheets();
+  syncPoints();
 
+  const now = new Date();
+  const timeStr = now.toLocaleString('en-GB', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  syncLog({ time: timeStr, studentId, type, reason: reasonText, points: pts, teacher });
+
+  showMsg(`${pts} pts (${type}) added for ${studentNames[studentId].split(' ')[0]} by ${teacher}`);
   teacherNameInput.value = '';
   itemSelect.value = '';
 };
@@ -400,8 +373,8 @@ resetStudentBtn.onclick = () => {
   points[idx] = {tanbeeh:0, tashjeeh:0};
   localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
   renderTable();
+  syncPoints();
   showMsg(`${studentNames[idx]} points reset`, 'warn');
-  syncToGoogleSheets();
 };
 
 clearHistoryBtn.onclick = () => {
@@ -415,13 +388,15 @@ clearHistoryBtn.onclick = () => {
 };
 
 typeSelect.onchange = updateItems;
-showParentBtn.onclick = () => window.open(SHEET_WEB_APP_URL, '_blank');
+showParentBtn.onclick = () => window.open("https://docs.google.com/spreadsheets/d/1Bi82dYxv_e7Jkkay-ymk9DucBcqbx7VU8KcSORwtXls/pubhtml", '_blank');
+showLogBtn.onclick    = () => window.open("https://docs.google.com/spreadsheets/d/1cfl6o6jXN32pQie_8X4ihB72PFfk9DaNknq1UQUVcD0/pubhtml", '_blank');
 
+// ─────────────────────── Init ───────────────────────
 populateStudents();
 updateItems();
 renderTable();
 renderHistory();
-syncToGoogleSheets();
+syncPoints();
 </script>
 </body>
 </html>
