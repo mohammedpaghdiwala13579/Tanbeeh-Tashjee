@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Teacher Portal — Tanbeeh & Tashjeeh</title>
+<style>
+  body{font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);min-height:100vh;margin:0;padding:20px;color:#333}
+  .wrap{max-width:1100px;margin:30px auto;background:rgba(255,255,255,0.97);padding:30px;border-radius:20px;box-shadow:0 20px 70px rgba(0,0,0,0.2);backdrop-filter:blur(12px)}
+  h1{margin:0 0 20px;font-size:30px;text-align:center;background:linear-gradient(90deg,#0f63a8,#1f8feb);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:end;margin-bottom:20px}
+  label{display:block;font-weight:600;margin-bottom:8px;color:#1f8feb}
+  select,input,button{padding:12px 14px;border-radius:12px;border:1px solid #d0e0ff;font-size:15px;transition:all .3s}
+  select:focus,input:focus{outline:none;border-color:#1f8feb;box-shadow:0 0 0 3px rgba(31,143,235,0.2)}
+  input{width:100%;box-sizing:border-box}
+  button{cursor:pointer;border:0;background:#1f8feb;color:white;font-weight:600;box-shadow:0 4px 15px rgba(31,143,235,0.3)}
+  button:hover{background:#0d6efd;transform:translateY(-2px)}
+  button.danger{background:#e04b4b;box-shadow:0 4px 15px rgba(224,75,75,0.3)}
+  button.danger:hover{background:#c82333}
+  button.small{padding:8px 14px;font-size:14px}
+  table{width:100%;border-collapse:separate;border-spacing:0;margin-top:20px;border-radius:16px;overflow:hidden;box-shadow:0 15px 40px rgba(0,0,0,0.12)}
+  th{background:linear-gradient(90deg,#0f63a8,#1f8feb);color:white;padding:18px;font-weight:600;text-transform:uppercase;font-size:14px}
+  td{padding:16px;background:#fdfdff;text-align:center}
+  tr:hover td{background:#f0f8ff}
+  .tan{background:#ffebee!important;color:#c62828;font-weight:700}
+  .tash{background:#e8f5e9!important;color:#2e7d32;font-weight:700}
+  .msg{padding:14px;border-radius:12px;margin:12px 0;font-weight:600}
+  .success{background:#e6ffed;border:2px solid #b6f0c8;color:#2e7d32}
+  .warn{background:#fff3e6;border:2px solid #ffd0a8;color:#e65100}
+  .history-section{margin-top:40px}
+  .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:15px}
+  .history-section h2{font-size:22px;margin:0;background:linear-gradient(90deg,#1f8feb,#0f63a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .history-table{font-size:14px}
+  .history-table th{background:#34495e;color:#ecf0f1}
+  .history-table td{padding:10px 12px;font-size:13.5px}
+  .log-tanbeeh{background:#ffebee;color:#c62828}
+  .log-tashjeeh{background:#e8f5e9;color:#2e7d32}
+  .teacher-name{font-weight:600;color:#1f8feb}
+  .timestamp{color:#777;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Teacher Portal — Tanbeeh & Tashjeeh</h1>
+
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px">
+    <div class="row" style="flex:1">
+      <div style="min-width:240px"><label>Student</label><select id="studentNo" style="width:100%"></select></div>
+      <div style="min-width:200px"><label>Type</label>
+        <select id="type">
+          <option value="Tanbeeh">Tanbeeh (Warning)</option>
+          <option value="Tashjeeh">Tashjeeh (Appreciation)</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:300px"><label>Reason</label><select id="item" style="width:100%"></select></div>
+      <div style="min-width:180px"><label>Teacher Name</label><input type="text" id="teacherName" placeholder="Enter your name" required /></div>
+      <div style="align-self:end">
+        <button id="addPts">Add Points</button>
+        <button id="resetStudent" class="danger small">Reset Student</button>
+      </div>
+    </div>
+    <div><button id="showParentBtn" class="small">Open Live Parent Portal</button></div>
+  </div>
+
+  <div id="message"></div>
+
+  <table id="pointsTable">
+    <thead>
+      <tr><th>No.</th><th>Name</th><th class="tan">Tanbeeh</th><th class="tash">Tashjee</th><th>Total</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- Activity History Log -->
+  <div class="history-section">
+    <div class="history-header">
+      <h2>Activity Log</h2>
+      <button id="clearHistoryBtn" class="danger small">Clear All Log</button>
+    </div>
+    <table class="history-table" id="historyTable">
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>Student</th>
+          <th>Type</th>
+          <th>Reason</th>
+          <th>Points</th>
+          <th>Added By</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ====== YOUR GOOGLE SHEET SYNC URL (ALREADY INSERTED) ======
+const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwc2PTgG3In70MsIwLeVkPgzxc5hsNhDwPxA5EcRbFms6cZ0Q0Bi6OHstNnzqiylRpy/exec";
+
+const STORAGE_KEY = 'tanbeehTashjeehPoints_v2';
+const HISTORY_KEY = 'tanbeehTashjeehHistory_v2';
+
+const studentNames = ["Burhanuddin ali mohammad bhai Bazar","Abdulkadir M. Mustafa Bhai Hamid","Taher Aliasger Bhai Musaji","Mustafa Yusuf Bhai Dawoodi","Mufaddal mustansir bhai rangwala","Husain Murtaza bhai Ahemadabad","Shabbir Habib Bhai Jalali","Taher Dawood Bhai Suksar","Mohammed Shk Huzaifa Shakir","Burhanuddin Shabbir Bhai Sabunwala","Adnan Juzer Bhai Banswadi","Aziz Husain Saeed Abbas Bhai Saghar","Burahanuddin hussain bhai chittalwala","Husain mohammad bhai bootwala","Mohammed Burhanuddin Bhai Gharyali","Husain murtaza Fatehnagar","Taha Firoz Bhai Petlawad","Burhanuddin Juzer Bhai Saifee","Ibrahim Aliasger Bhai Marhaba","Qusai Mandasaur","Taha Fakhruddin Bhagat","Mohammed Mustafa bhai Dewaswala","Burhanuddin Saleh Bhai Lakda","Abdulqadir Haider Disa","Mohammed Primas","Mohammed Mustafa Bhai Qudrati","Hussain Yusuf bhai kanore wala","Ibrahim Hatim Bhai Pathari","Murtaza Raj","Mufaddal Yusuf Bhai Motor","Hatim Abbas Bhai Kathana","Behlul Khuzaima Saifee","Mohammed Mustafa Bhai Paghri","Hussain Sadri","Fakhruddin murtaza bhai ezzy","Taha Abbas Bhai Mhow"];
+
+const tanbeehData = [{text:"Khidmat Guzaro ni taazem ma farq paru che",pts:10},{text:"Bad kalam che, Gaali bolva ni adat che",pts:5},{text:"taheez ma pota na quran nai lauta",pts:2},{text:"Khidmatguzaar, staff, farzando sathe sulook barabar nathi",pts:2},{text:"Sareqat kidi che",pts:10},{text:"jhoot bole che",pts:2},{text:"Building ma farzando sathe jhagro kare che",pts:3},{text:"Nizaam mutabiq amal karva ma be farag nazar ave che (Taujih karva baad)",pts:1},{text:"Tilawat Al-Dua ma potani Qiraat/Dua ni tilawat na kidi",pts:3},{text:"ghair mumasib shakelt si kapda pehne che (Taujih karva baad)",pts:2},{text:"Baghair raza jagah par electronic gadgets rakhe che",pts:3},{text:"Launday ma kapda nathi apta",pts:5},{text:"Tahfeez ma takheer si hazir thaye che (Taujih karva baad)",pts:4},{text:"Tilawat Al-Dua ma Dua ni Tilawat ma ghair hazir hata",pts:2},{text:"Namaz ma masallo lai ne nathi aya (per namaz)",pts:1},{text:"Namaz ma ghair hazir rahe che (per day)",pts:5},{text:"azan aapwa waste gair hazir hata",pts:5},{text:"MHD equipments nesambhalwa ma faraq kido che",pts:1},{text:"Room ma cricket ya e misal ni games rame che",pts:3},{text:"Room ni lights, fan band nathi kidi",pts:2},{text:"Libaas ni nazafat nathi rakhata (Taujih karva bad)",pts:2},{text:"Mohta baal rakhe che (Taujih karva bad)",pts:3},{text:"Raate tilawat Al-Qasaid ma ghair hazir rahe che (Weekly)",pts:3},{text:"Tilawat al-Qasaid ma takheer si ave che",pts:1},{text:"Bed par chadar nathi",pts:2},{text:"Bed par kapda kitabo ya bags muke che",pts:2}];
+
+const tashjeehData = [{text:"Active participation in sports event (Weekly)",pts:2},{text:"Active participation in vocal practice (Weekly)",pts:2},{text:"Active performance in Events; Participation in Internal Events",pts:1},{text:"Actively assists in winding up and maintaining cleanliness",pts:2},{text:"Balancing Academics and Sports",pts:2},{text:"Bimar farzand ne pareegva gaya",pts:2},{text:"Class test ma performance achu che",pts:3},{text:"Teamwork in academic projects",pts:5},{text:"Consistently follows instructions with care and accuracy",pts:7},{text:"Duo ni tilawat kare che (Weekly)",pts:3},{text:"Ek mahina ma 10 si 14 Safahat na darmiyaan jaeed hifz",pts:5},{text:"Ek mahina ma 15 si 20 Safahat na darmiyaan jaeed hifz",pts:10},{text:"Fajar ni namaz baad tul u shams lag masail par bethi ne duo parhwani aadat",pts:3},{text:"Fajr ni Namaz ma 100% Hazri che (Weekly)",pts:5},{text:"Ghana behtar andaz ma takbeera dida che",pts:3},{text:"Ghani behtar andaz ma azan didi che",pts:2},{text:"Habitually reads periodicals and stays aware",pts:5},{text:"Hafiz che ane hifz mazboot rakhe (Weekly)",pts:7},{text:"Has achieved success in external exams",pts:3},{text:"Performed well in skits/quiz/stage program",pts:3},{text:"library ma si kitabo lai ne parhwa ni adat (daily)",pts:3},{text:"Majlis ma behtar shakelet si tilawat kidi che",pts:1},{text:"Maktabat na kitabao ma si daily reading",pts:5},{text:"Marhala na ikhtebaar ma kamyab thaya che",pts:20},{text:"muhafiz je tasks aape che ehne behtar shakelet si kare che (Weekly)",pts:3},{text:"Nahna darajah na farzand ne 'bhai' kahi ne bulave che",pts:2}];
+
+let points = JSON.parse(localStorage.getItem(STORAGE_KEY)) || Array(studentNames.length).fill().map(()=>({tanbeeh:0,tashjeeh:0}));
+let history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+
+const studentSelect = document.getElementById('studentNo');
+const typeSelect = document.getElementById('type');
+const itemSelect = document.getElementById('item');
+const teacherNameInput = document.getElementById('teacherName');
+const addBtn = document.getElementById('addPts');
+const resetStudentBtn = document.getElementById('resetStudent');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const messageDiv = document.getElementById('message');
+const tableBody = document.querySelector('#pointsTable tbody');
+const historyBody = document.querySelector('#historyTable tbody');
+const showParentBtn = document.getElementById('showParentBtn');
+
+// Sync to Google Sheets
+function syncToGoogleSheets() {
+  fetch(SHEET_WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify(points),
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' }
+  });
+}
+
+function populateStudents(){
+  studentSelect.innerHTML = '<option value="">Select Student</option>';
+  studentNames.forEach((n,i)=>{
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${i+1}. ${n}`;
+    studentSelect.appendChild(opt);
+  });
+}
+
+function updateItems(){
+  const data = (typeSelect.value === 'Tanbeeh') ? tanbeehData : tashjeehData;
+  itemSelect.innerHTML = '<option value="">Select Reason</option>';
+  data.forEach((it,idx)=>{
+    const o = document.createElement('option');
+    o.value = idx;
+    o.textContent = `${it.text} (+${it.pts} pts)`;
+    itemSelect.appendChild(o);
+  });
+}
+
+function renderTable(){
+  tableBody.innerHTML = '';
+  points.forEach((p,i)=>{
+    const total = p.tashjeeh - p.tanbeeh;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td><td style="text-align:left">${studentNames[i]}</td><td class="tan">${p.tanbeeh}</td><td class="tash">${p.tashjeeh}</td><td style="font-weight:700;color:${total>=0?'#2e7d32':'#c62828'}">${total}</td>`;
+    tableBody.appendChild(tr);
+  });
+}
+
+function renderHistory(){
+  historyBody.innerHTML = '';
+  if (history.length === 0) {
+    historyBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#777;padding:20px">No activity recorded yet</td></tr>';
+    return;
+  }
+  history.slice().reverse().forEach(log => {
+    const tr = document.createElement('tr');
+    tr.className = log.type === 'Tanbeeh' ? 'log-tanbeeh' : 'log-tashjeeh';
+    tr.innerHTML = `
+      <td class="timestamp">${log.time}</td>
+      <td>${studentNames[log.studentId].split(' ').slice(0,3).join(' ')}...</td>
+      <td><strong>${log.type}</strong></td>
+      <td>${log.reason}</td>
+      <td><strong>${log.type === 'Tanbeeh' ? '-' : '+'}${log.points}</strong></td>
+      <td class="teacher-name">${log.teacher}</td>
+    `;
+    historyBody.appendChild(tr);
+  });
+}
+
+function showMsg(txt, cls = 'success'){
+  messageDiv.innerHTML = `<div class="msg ${cls}">${txt}</div>`;
+  setTimeout(() => messageDiv.innerHTML = '', 5000);
+}
+
+function addLogEntry(studentId, type, reason, points, teacher) {
+  const now = new Date();
+  const timeStr = now.toLocaleString('en-GB', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  history.push({ time: timeStr, studentId, type, reason, points, teacher: teacher.trim() || "Unknown" });
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  renderHistory();
+}
+
+// Add Points
+addBtn.addEventListener('click', ()=>{
+  const studentId = parseInt(studentSelect.value,10);
+  const type = typeSelect.value;
+  const itemIdx = parseInt(itemSelect.value,10);
+  const teacher = teacherNameInput.value.trim();
+
+  if (isNaN(studentId) || studentId < 0) return showMsg('Please select a student', 'warn');
+  if (isNaN(itemIdx) || itemIdx < 0) return showMsg('Please select a reason', 'warn');
+  if (!teacher) return showMsg('Please enter your name', 'warn');
+
+  const data = type === 'Tanbeeh' ? tanbeehData : tashjeehData;
+  const pts = data[itemIdx].pts;
+  const reasonText = data[itemIdx].text;
+
+  if(type === 'Tanbeeh') points[studentId].tanbeeh += pts;
+  else points[studentId].tashjeeh += pts;
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
+  addLogEntry(studentId, type, reasonText, pts, teacher);
+  renderTable();
+  showMsg(`${pts} pts (${type}) added to ${studentNames[studentId]} by ${teacher}`);
+  syncToGoogleSheets();  // LIVE SYNC
+
+  teacherNameInput.value = '';
+  itemSelect.value = '';
+});
+
+// Reset Student
+resetStudentBtn.addEventListener('click', ()=>{
+  if(!confirm('Reset this student points to zero?')) return;
+  const idx = parseInt(studentSelect.value,10);
+  if (isNaN(idx)) return showMsg('Select a student first', 'warn');
+  points[idx] = {tanbeeh:0, tashjeeh:0};
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
+  renderTable();
+  showMsg(`${studentNames[idx]} points reset`, 'warn');
+  syncToGoogleSheets();  // LIVE SYNC
+});
+
+// Clear History
+clearHistoryBtn.addEventListener('click', () => {
+  if (history.length === 0) return showMsg('Log is already empty', 'warn');
+  if (confirm('Delete ALL activity log permanently?')) {
+    history = [];
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+    showMsg('Activity log cleared', 'warn');
+  }
+});
+
+typeSelect.addEventListener('change', updateItems);
+showParentBtn.addEventListener('click', () => window.open(SHEET_WEB_APP_URL, '_blank'));
+
+// Initialize
+populateStudents();
+updateItems();
+renderTable();
+renderHistory();
+syncToGoogleSheets(); // Initial sync on load
+</script>
+</body>
+</html>
