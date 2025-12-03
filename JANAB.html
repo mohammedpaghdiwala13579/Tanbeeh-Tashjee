@@ -268,8 +268,8 @@
       <div class="form-group">
         <label>Type</label>
         <select id="type">
-          <option value="Tanbeeh">Tanbeeh (Warning)</option>
-          <option value="Tashjeeh">Tashjeeh (Appreciation)</option>
+          <option value="Tanbeeh">Tanbeeh</option>
+          <option value="Tashjeeh">Tashjeeh</option>
         </select>
       </div>
       <div class="form-group">
@@ -285,7 +285,8 @@
     <div class="btn-group">
       <button id="addPts" class="btn-primary">Add Points</button>
       <button id="resetStudent" class="btn-danger">Reset Student</button>
-      <button id="showParentBtn" class="btn-secondary">Live Parent Portal</button>
+      <button id="showParentBtn" class="btn-secondary">.</button>
+      <button id="syncFromSheetsBtn" class="btn-secondary">.</button>
     </div>
   </div>
 
@@ -307,7 +308,7 @@
   <div class="card history-card">
     <div class="history-header">
       <h2>Activity Log</h2>
-      <button id="clearHistoryBtn" class="btn-danger">Clear All Log</button>
+      <button id="clearHistoryBtn" class="btn-danger">Clear Local Log</button>
     </div>
     <div class="table-container">
       <table class="history-table" id="historyTable">
@@ -320,10 +321,8 @@
   </div>
 </div>
 
-<!-- Original JavaScript (unchanged) -->
 <script>
-// [All your original JavaScript code — exactly the same as before]
-const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwc2PTgG3In70MsIwLeVkPgzxc5hsNhDwPxA5EcRbFms6cZ0Q0Bi6OHstNnzqiylRpy/exec";
+const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby2A3zcBWcrDIDTxIAveueqx5N-bnhDGMeWtomcPKtRm6q3z9Qsr8UgJX_RsV5WAVTS/exec";
 const STORAGE_KEY = 'tanbeehTashjeehPoints_v2';
 const HISTORY_KEY = 'tanbeehTashjeehHistory_v2';
 
@@ -347,9 +346,103 @@ const messageDiv = document.getElementById('message');
 const tableBody = document.querySelector('#pointsTable tbody');
 const historyBody = document.querySelector('#historyTable tbody');
 const showParentBtn = document.getElementById('showParentBtn');
+const syncFromSheetsBtn = document.getElementById('syncFromSheetsBtn');
 
-function syncToGoogleSheets() {
-  fetch(SHEET_WEB_APP_URL, { method: 'POST', body: JSON.stringify(points), mode: 'no-cors', headers: { 'Content-Type': 'text/plain' } });
+// Initialize from Google Sheets on page load
+function initFromGoogleSheets() {
+  // Get points from Google Sheets
+  fetch(`${SHEET_WEB_APP_URL}?action=getPoints`)
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.text();
+    })
+    .then(text => {
+      try {
+        const sheetsPoints = JSON.parse(text);
+        if (sheetsPoints && sheetsPoints.length === studentNames.length) {
+          points = sheetsPoints;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
+          renderTable();
+          console.log("Loaded points from Google Sheets");
+        }
+      } catch (e) {
+        console.log("Could not parse points from Google Sheets:", e);
+      }
+    })
+    .catch(err => console.log("Could not load points from Google Sheets:", err));
+  
+  // Get history from Google Sheets
+  fetch(`${SHEET_WEB_APP_URL}?action=getHistory`)
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.text();
+    })
+    .then(text => {
+      try {
+        const sheetsHistory = JSON.parse(text);
+        if (sheetsHistory && sheetsHistory.length > 0) {
+          history = sheetsHistory;
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+          renderHistory();
+          console.log("Loaded history from Google Sheets");
+        }
+      } catch (e) {
+        console.log("Could not parse history from Google Sheets:", e);
+      }
+    })
+    .catch(err => console.log("Could not load history from Google Sheets:", err));
+}
+
+// Sync to Google Sheets - Only ADD, not overwrite
+function syncToGoogleSheets(studentId, type, pointsToAdd, reasonText, teacher) {
+  // Send ADD action for points
+  fetch(SHEET_WEB_APP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      action: "add",
+      data: {
+        studentId: studentId,
+        type: type,
+        points: pointsToAdd
+      }
+    })
+  }).catch(err => console.log("Error syncing points:", err));
+  
+  // Also add to history
+  const now = new Date();
+  const timeStr = now.toLocaleString('en-GB', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+  
+  fetch(SHEET_WEB_APP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      action: "addHistory",
+      data: {
+        time: timeStr,
+        studentId: studentId,
+        type: type,
+        reason: reasonText,
+        points: pointsToAdd,
+        teacher: teacher
+      }
+    })
+  }).catch(err => console.log("Error syncing history:", err));
+}
+
+// Manually sync from Google Sheets
+function syncFromSheets() {
+  showMsg("Syncing from Google Sheets...", 'success');
+  initFromGoogleSheets();
+  setTimeout(() => {
+    showMsg("Sync complete! Local data updated from Google Sheets.", 'success');
+  }, 1000);
 }
 
 function populateStudents(){
@@ -425,6 +518,7 @@ addBtn.onclick = () => {
   const pts = data[itemIdx].pts;
   const reasonText = data[itemIdx].text;
 
+  // Update local storage
   if(type === 'Tanbeeh') points[studentId].tanbeeh += pts;
   else points[studentId].tashjeeh += pts;
 
@@ -432,41 +526,47 @@ addBtn.onclick = () => {
   addLogEntry(studentId, type, reasonText, pts, teacher);
   renderTable();
   showMsg(`${pts} pts (${type}) added for ${studentNames[studentId].split(' ')[0]} by ${teacher}`);
-  syncToGoogleSheets();
+  
+  // Sync to Google Sheets (ADD only)
+  syncToGoogleSheets(studentId, type, pts, reasonText, teacher);
 
   teacherNameInput.value = '';
   itemSelect.value = '';
 };
 
 resetStudentBtn.onclick = () => {
-  if(!confirm('Reset this student points to zero?')) return;
+  if(!confirm('Reset this student points to zero? (Local only - Google Sheets will keep previous points)')) return;
   const idx = parseInt(studentSelect.value);
   if (isNaN(idx)) return showMsg('Select a student first', 'warn');
   points[idx] = {tanbeeh:0, tashjeeh:0};
   localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
   renderTable();
-  showMsg(`${studentNames[idx]} points reset`, 'warn');
-  syncToGoogleSheets();
+  showMsg(`${studentNames[idx]} points reset locally (Google Sheets unchanged)`, 'warn');
+  // NO syncToGoogleSheets() here - Sheets keeps the data!
 };
 
 clearHistoryBtn.onclick = () => {
   if (history.length === 0) return showMsg('Log is already empty', 'warn');
-  if (confirm('Delete ALL activity log permanently?')) {
+  if (confirm('Delete ALL local activity log? (Google Sheets history will remain)')) {
     history = [];
     localStorage.removeItem(HISTORY_KEY);
     renderHistory();
-    showMsg('Activity log cleared', 'warn');
+    showMsg('Local activity log cleared (Google Sheets unchanged)', 'warn');
   }
 };
 
 typeSelect.onchange = updateItems;
 showParentBtn.onclick = () => window.open(SHEET_WEB_APP_URL, '_blank');
+syncFromSheetsBtn.onclick = syncFromSheets;
 
-populateStudents();
-updateItems();
-renderTable();
-renderHistory();
-syncToGoogleSheets();
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+  populateStudents();
+  updateItems();
+  initFromGoogleSheets(); // Load from Sheets first
+  renderTable();
+  renderHistory();
+});
 </script>
 </body>
 </html>
