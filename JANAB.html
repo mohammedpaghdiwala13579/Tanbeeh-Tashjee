@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -323,11 +322,15 @@
 </div>
 
 <script>
-const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxuYfx40BopDL4xhK1hWRADSmiJM8NzyfoiPU5kr9xtrH_KWj47HVt65PWrZTeChMWg/exec";
+const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC06GlxFqVYDMX7Tfjxyx-nbUYwIEL5fu0CDy3RjEydqco8lV-bEpmiDHKK3guf_yt/exec";
 const STORAGE_KEY = 'tanbeehTashjeehPoints_v2';
 const HISTORY_KEY = 'tanbeehTashjeehHistory_v2';
 
-const studentNames = ["Burhanuddin ali mohammad bhai Bazar","Abdulkadir M. Mustafa Bhai Hamid","Taher Aliasger Bhai Musaji","Mustafa Yusuf Bhai Dawoodi","Mufaddal mustansir bhai rangwala","Husain Murtaza bhai Ahemadabad","Shabbir Habib Bhai Jalali","Taher Dawood Bhai Suksar","Mohammed Shk Huzaifa Shakir","Burhanuddin Shabbir Bhai Sabunwala","Adnan Juzer Bhai Banswadi","Aziz Husain Saeed Abbas Bhai Saghar","Burahanuddin hussain bhai chittalwala","Husain mohammad bhai bootwala","Mohammed Burhanuddin Bhai Gharyali","Husain murtaza Fatehnagar","Taha Firoz Bhai Petlawad","Burhanuddin Juzer Bhai Saifee","Ibrahim Aliasger Bhai Marhaba","Qusai Mandasaur","Taha Fakhruddin Bhagat","Mohammed Mustafa bhai Dewaswala","Burhanuddin Saleh Bhai Lakda","Abdulqadir Haider Disa","Mohammed Primas","Mohammed Mustafa Bhai Qudrati","Hussain Yusuf bhai kanore wala","Ibrahim Hatim Bhai Pathari","Murtaza Raj","Mufaddal Yusuf Bhai Motor","Hatim Abbas Bhai Kathana","Behlul Khuzaima Saifee","Mohammed Mustafa Bhai Paghri","Hussain Sadri","Fakhruddin murtaza bhai ezzy","Taha Abbas Bhai Mhow"];
+/* ===========================
+   NAMES — now dynamic
+   (removed hard-coded array)
+   =========================== */
+let studentNames = [];
 
 const tanbeehData = [{text:"Khidmat Guzaro ni taazem ma farq paru che",pts:10},{text:"Bad kalam che, Gaali bolva ni adat che",pts:5},{text:"taheez ma pota na quran nai lauta",pts:2},{text:"Khidmatguzaar, staff, farzando sathe sulook barabar nathi",pts:2},{text:"Sareqat kidi che",pts:10},{text:"jhoot bole che",pts:2},{text:"Building ma farzando sathe jhagro kare che",pts:3},{text:"Nizaam mutabiq amal karva ma be farag nazar ave che (Taujih karva baad)",pts:1},{text:"Tilawat Al-Dua ma potani Qiraat/Dua ni tilawat na kidi",pts:3},{text:"ghair mumasib shakelt si kapda pehne che (Taujih karva baad)",pts:2},{text:"Baghair raza jagah par electronic gadgets rakhe che",pts:3},{text:"Launday ma kapda nathi apta",pts:5},{text:"Tahfeez ma takheer si hazir thaye che (Taujih karva baad)",pts:4},{text:"Tilawat Al-Dua ma Dua ni Tilawat ma ghair hazir hata",pts:2},{text:"Namaz ma masallo lai ne nathi aya (per namaz)",pts:1},{text:"Namaz ma ghair hazir rahe che (per day)",pts:5},{text:"azan aapwa waste gair hazir hata",pts:5},{text:"MHD equipments nesambhalwa ma faraq kido che",Pts:1},{text:"Room ma cricket ya e misal ni games rame che",pts:3},{text:"Room ni lights, fan band nathi kidi",pts:2},{text:"Libaas ni nazafat nathi rakhata (Taujih karva bad)",pts:2},{text:"Mohta baal rakhe che (Taujih karva bad)",pts:3},{text:"Raate tilawat Al-Qasaid ma ghair hazir rahe che (Weekly)",pts:3},{text:"Tilawat al-Qasaid ma takheer si ave che",pts:1},{text:"Bed par chadar nathi",pts:2},{text:"Bed par kapda kitabo ya bags muke che",pts:2}];
 
@@ -349,6 +352,23 @@ const historyBody = document.querySelector('#historyTable tbody');
 const showParentBtn = document.getElementById('showParentBtn');
 const syncFromSheetsBtn = document.getElementById('syncFromSheetsBtn');
 
+/* ---------------- LOAD STUDENT NAMES FROM SHEETS ---------------- */
+async function loadStudentNames() {
+  try {
+    const res = await fetch(`${SHEET_WEB_APP_URL}?action=getNames`);
+    if (!res.ok && res.status !== 0) throw new Error('Network response was not ok');
+    const names = await res.json();
+    studentNames = Array.isArray(names) ? names : [];
+    // ensure points state matches new names length
+    if (!points || points.length !== studentNames.length) {
+      points = Array(studentNames.length).fill().map(()=>({tanbeeh:0,tashjeeh:0}));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
+    }
+  } catch (err) {
+    console.log("Could not load student names from Google Sheets:", err);
+  }
+}
+
 // Initialize from Google Sheets on page load
 function initFromGoogleSheets() {
   // Get points from Google Sheets
@@ -365,6 +385,11 @@ function initFromGoogleSheets() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
           renderTable();
           console.log("Loaded points from Google Sheets");
+        } else if (sheetsPoints && sheetsPoints.length > 0 && studentNames.length === 0) {
+          // fallback if names not loaded yet: set points length to sheetsPoints length
+          points = sheetsPoints;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
+          renderTable();
         }
       } catch (e) {
         console.log("Could not parse points from Google Sheets:", e);
@@ -472,7 +497,7 @@ function renderTable(){
   points.forEach((p, i) => {
     const total = p.tashjeeh - p.tanbeeh;
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td><td style="text-align:left;max-width:220px;word-wrap:break-word;">${studentNames[i]}</td><td class="tan">${p.tanbeeh}</td><td class="tash">${p.tashjeeh}</td><td class="${total >= 0 ? 'total-positive' : 'total-negative'}"><strong>${total}</strong></td>`;
+    tr.innerHTML = `<td>${i+1}</td><td style="text-align:left;max-width:220px;word-wrap:break-word;">${studentNames[i] || '—'}</td><td class="tan">${p.tanbeeh}</td><td class="tash">${p.tashjeeh}</td><td class="${total >= 0 ? 'total-positive' : 'total-negative'}"><strong>${total}</strong></td>`;
     tableBody.appendChild(tr);
   });
 }
@@ -484,10 +509,10 @@ function renderHistory(){
     return;
   }
   history.slice().reverse().forEach(log => {
-    const shortName = studentNames[log.studentId].split(' ').slice(0,4).join(' ') + (studentNames[log.studentId].split(' ').length > 4 ? '...' : '');
+    const shortName = (studentNames[log.studentId] || '').split(' ').slice(0,4).join(' ') + ((studentNames[log.studentId] || '').split(' ').length > 4 ? '...' : '');
     const tr = document.createElement('tr');
     tr.className = log.type === 'Tanbeeh' ? 'log-tanbeeh' : 'log-tashjeeh';
-    tr.innerHTML = `<td class="timestamp">${log.time}</td><td>${shortName}</td><td><strong>${log.type}</strong></td><td style="max-width:230px;word-wrap:break-word;">${log.reason}</td><td><strong>${log.type === 'Tanbeeh' ? '-' : '+'}${log.points}</td><td class="teacher-name">${log.teacher}</td>`;
+    tr.innerHTML = `<td class="timestamp">${log.time}</td><td>${shortName || log.studentName || '—'}</td><td><strong>${log.type}</strong></td><td style="max-width:230px;word-wrap:break-word;">${log.reason}</td><td><strong>${log.type === 'Tanbeeh' ? '-' : '+'}${log.points}</td><td class="teacher-name">${log.teacher}</td>`;
     historyBody.appendChild(tr);
   });
 }
@@ -526,7 +551,7 @@ addBtn.onclick = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
   addLogEntry(studentId, type, reasonText, pts, teacher);
   renderTable();
-  showMsg(`${pts} pts (${type}) added for ${studentNames[studentId].split(' ')[0]} by ${teacher}`);
+  showMsg(`${pts} pts (${type}) added for ${ (studentNames[studentId] || 'Student') .split(' ')[0]} by ${teacher}`);
   
   // Sync to Google Sheets (ADD only)
   syncToGoogleSheets(studentId, type, pts, reasonText, teacher);
@@ -542,7 +567,7 @@ resetStudentBtn.onclick = () => {
   points[idx] = {tanbeeh:0, tashjeeh:0};
   localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
   renderTable();
-  showMsg(`${studentNames[idx]} points reset locally (Google Sheets unchanged)`, 'warn');
+  showMsg(`${studentNames[idx] || 'Student'} points reset locally (Google Sheets unchanged)`, 'warn');
   // NO syncToGoogleSheets() here - Sheets keeps the data!
 };
 
@@ -561,7 +586,8 @@ showParentBtn.onclick = () => window.open(SHEET_WEB_APP_URL, '_blank');
 syncFromSheetsBtn.onclick = syncFromSheets;
 
 // Initialize on page load
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadStudentNames();
   populateStudents();
   updateItems();
   initFromGoogleSheets(); // Load from Sheets first
