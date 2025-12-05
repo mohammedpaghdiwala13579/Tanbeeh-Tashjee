@@ -24,12 +24,10 @@
     padding: 15px 10px;
     color: white;
     
-    /* Same background + blur as login page */
     background: url("https://i.ibb.co/1Jw8zpzX/Lingmala.jpg") center/cover no-repeat fixed;
     position: relative;
   }
 
-  /* Dark overlay + blur */
   body::before {
     content: "";
     position: fixed;
@@ -41,7 +39,6 @@
 
   .container { max-width: 1100px; margin: 0 auto; }
 
-  /* Header */
   .header {
     display: flex;
     align-items: center;
@@ -82,7 +79,6 @@
     margin-top: 6px;
   }
 
-  /* Glass Cards */
   .card {
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(20px);
@@ -247,7 +243,6 @@
 
 <div class="container">
 
-  <!-- Header with Logo + Title -->
   <div class="header">
     <div class="logo">
       <img src="https://i.ibb.co/Ndqj258K/panchgani-removebg-preview.png" alt="Logo">
@@ -258,7 +253,6 @@
     </div>
   </div>
 
-  <!-- Form Card -->
   <div class="card">
     <div class="form-grid">
       <div class="form-group">
@@ -285,14 +279,13 @@
     <div class="btn-group">
       <button id="addPts" class="btn-primary">Add Points</button>
       <button id="resetStudent" class="btn-danger">Reset Student</button>
-      <button id="showParentBtn" class="btn-secondary">Parent Sheet</button>
+      <!-- Parent Sheet button removed from UI -->
       <button id="syncFromSheetsBtn" class="btn-secondary">Sync</button>
     </div>
   </div>
 
   <div id="message"></div>
 
-  <!-- Points Table Card -->
   <div class="card">
     <div class="table-container">
       <table id="pointsTable">
@@ -304,7 +297,6 @@
     </div>
   </div>
 
-  <!-- History Card -->
   <div class="card history-card">
     <div class="history-header">
       <h2>Activity Log</h2>
@@ -326,13 +318,9 @@ const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxC06GlxFqVYD
 const STORAGE_KEY = 'tanbeehTashjeehPoints_v2';
 const HISTORY_KEY = 'tanbeehTashjeehHistory_v2';
 
-/* ===========================
-   NAMES — now dynamic
-   (removed hard-coded array)
-   =========================== */
 let studentNames = [];
 
-const tanbeehData = [{text:"Khidmat Guzaro ni taazem ma farq paru che",pts:10},{text:"Bad kalam che, Gaali bolva ni adat che",pts:5},{text:"taheez ma pota na quran nai lauta",pts:2},{text:"Khidmatguzaar, staff, farzando sathe sulook barabar nathi",pts:2},{text:"Sareqat kidi che",pts:10},{text:"jhoot bole che",pts:2},{text:"Building ma farzando sathe jhagro kare che",pts:3},{text:"Nizaam mutabiq amal karva ma be farag nazar ave che (Taujih karva baad)",pts:1},{text:"Tilawat Al-Dua ma potani Qiraat/Dua ni tilawat na kidi",pts:3},{text:"ghair mumasib shakelt si kapda pehne che (Taujih karva baad)",pts:2},{text:"Baghair raza jagah par electronic gadgets rakhe che",pts:3},{text:"Launday ma kapda nathi apta",pts:5},{text:"Tahfeez ma takheer si hazir thaye che (Taujih karva baad)",pts:4},{text:"Tilawat Al-Dua ma Dua ni Tilawat ma ghair hazir hata",pts:2},{text:"Namaz ma masallo lai ne nathi aya (per namaz)",pts:1},{text:"Namaz ma ghair hazir rahe che (per day)",pts:5},{text:"azan aapwa waste gair hazir hata",pts:5},{text:"MHD equipments nesambhalwa ma faraq kido che",Pts:1},{text:"Room ma cricket ya e misal ni games rame che",pts:3},{text:"Room ni lights, fan band nathi kidi",pts:2},{text:"Libaas ni nazafat nathi rakhata (Taujih karva bad)",pts:2},{text:"Mohta baal rakhe che (Taujih karva bad)",pts:3},{text:"Raate tilawat Al-Qasaid ma ghair hazir rahe che (Weekly)",pts:3},{text:"Tilawat al-Qasaid ma takheer si ave che",pts:1},{text:"Bed par chadar nathi",pts:2},{text:"Bed par kapda kitabo ya bags muke che",pts:2}];
+const tanbeehData = [{text:"Khidmat Guzaro ni taazem ma farq paru che",pts:10},{text:"Bad kalam che, Gaali bolva ni adat che",pts:5},{text:"taheez ma pota na quran nai lauta",pts:2},{text:"Khidmatguzaar, staff, farzando sathe sulook barabar nathi",pts:2},{text:"Sareqat kidi che",pts:10},{text:"jhoot bole che",pts:2},{text:"Building ma farzando sathe jhagro kare che",pts:3},{text:"Nizaam mutabiq amal karva ma be farag nazar ave che (Taujih karva baad)",pts:1},{text:"Tilawat Al-Dua ma potani Qiraat/Dua ni tilawat na kidi",pts:3},{text:"ghair mumasib shakelt si kapda pehne che (Taujih karva baad)",pts:2},{text:"Baghair raza jagah par electronic gadgets rakhe che",pts:3},{text:"Launday ma kapda nathi apta",pts:5},{text:"Tahfeez ma takheer si hazir thaye che (Taujih karva baad)",pts:4},{text:"Tilawat Al-Dua ma Dua ni Tilawat ma ghair hazir hata",pts:2},{text:"Namaz ma masallo lai ne nathi aya (per namaz)",pts:1},{text:"Namaz ma ghair hazir rahe che (per day)",pts:5},{text:"azan aapwa waste gair hazir hata",pts:5},{text:"MHD equipments nesambhalwa ma faraq kido che",pts:1},{text:"Room ma cricket ya e misal ni games rame che",pts:3},{text:"Room ni lights, fan band nathi kidi",pts:2},{text:"Libaas ni nazafat nathi rakhata (Taujih karva bad)",pts:2},{text:"Mohta baal rakhe che (Taujih karva bad)",pts:3},{text:"Raate tilawat Al-Qasaid ma ghair hazir rahe che (Weekly)",pts:3},{text:"Tilawat al-Qasaid ma takheer si ave che",pts:1},{text:"Bed par chadar nathi",pts:2},{text:"Bed par kapda kitabo ya bags muke che",pts:2}];
 
 const tashjeehData = [{text:"Active participation in sports event (Weekly)",pts:2},{text:"Active participation in vocal practice (Weekly)",pts:2},{text:"Active performance in Events; Participation in Internal Events",pts:1},{text:"Actively assists in winding up and maintaining cleanliness",pts:2},{text:"Balancing Academics and Sports",pts:2},{text:"Bimar farzand ne pareegva gaya",pts:2},{text:"Class test ma performance achu che",pts:3},{text:"Teamwork in academic projects",pts:5},{text:"Consistently follows instructions with care and accuracy",pts:7},{text:"Duo ni tilawat kare che (Weekly)",pts:3},{text:"Ek mahina ma 10 si 14 Safahat na darmiyaan jaeed hifz",pts:5},{text:"Ek mahina ma 15 si 20 Safahat na darmiyaan jaeed hifz",pts:10},{text:"Fajar ni namaz baad tul u shams lag masail par bethi ne duo parhwani aadat",pts:3},{text:"Fajr ni Namaz ma 100% Hazri che (Weekly)",pts:5},{text:"Ghana behtar andaz ma takbeera dida che",pts:3},{text:"Ghani behtar andaz ma azan didi che",pts:2},{text:"Habitually reads periodicals and stays aware",pts:5},{text:"Hafiz che ane hifz mazboot rakhe (Weekly)",pts:7},{text:"Has achieved success in external exams",pts:3},{text:"Performed well in skits/quiz/stage program",pts:3},{text:"library ma si kitabo lai ne parhwa ni adat (daily)",pts:3},{text:"Majlis ma behtar shakelet si tilawat kidi che",pts:1},{text:"Maktabat na kitabao ma si daily reading",pts:5},{text:"Marhala na ikhtebaar ma kamyab thaya che",pts:20},{text:"muhafiz je tasks aape che ehne behtar shakelet si kare che (Weekly)",pts:3},{text:"Nahna darajah na farzand ne 'bhai' kahi ne bulave che",pts:2}];
 
@@ -349,7 +337,6 @@ const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 const messageDiv = document.getElementById('message');
 const tableBody = document.querySelector('#pointsTable tbody');
 const historyBody = document.querySelector('#historyTable tbody');
-const showParentBtn = document.getElementById('showParentBtn');
 const syncFromSheetsBtn = document.getElementById('syncFromSheetsBtn');
 
 /* ---------------- LOAD STUDENT NAMES FROM SHEETS ---------------- */
@@ -359,7 +346,6 @@ async function loadStudentNames() {
     if (!res.ok && res.status !== 0) throw new Error('Network response was not ok');
     const names = await res.json();
     studentNames = Array.isArray(names) ? names : [];
-    // ensure points state matches new names length
     if (!points || points.length !== studentNames.length) {
       points = Array(studentNames.length).fill().map(()=>({tanbeeh:0,tashjeeh:0}));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
@@ -369,9 +355,7 @@ async function loadStudentNames() {
   }
 }
 
-// Initialize from Google Sheets on page load
 function initFromGoogleSheets() {
-  // Get points from Google Sheets
   fetch(`${SHEET_WEB_APP_URL}?action=getPoints`)
     .then(response => {
       if (!response.ok) throw new Error('Network response was not ok');
@@ -386,7 +370,6 @@ function initFromGoogleSheets() {
           renderTable();
           console.log("Loaded points from Google Sheets");
         } else if (sheetsPoints && sheetsPoints.length > 0 && studentNames.length === 0) {
-          // fallback if names not loaded yet: set points length to sheetsPoints length
           points = sheetsPoints;
           localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
           renderTable();
@@ -397,7 +380,6 @@ function initFromGoogleSheets() {
     })
     .catch(err => console.log("Could not load points from Google Sheets:", err));
   
-  // Get history from Google Sheets
   fetch(`${SHEET_WEB_APP_URL}?action=getHistory`)
     .then(response => {
       if (!response.ok) throw new Error('Network response was not ok');
@@ -419,50 +401,31 @@ function initFromGoogleSheets() {
     .catch(err => console.log("Could not load history from Google Sheets:", err));
 }
 
-// Sync to Google Sheets - Only ADD, not overwrite
 function syncToGoogleSheets(studentId, type, pointsToAdd, reasonText, teacher) {
-  // Send ADD action for points
   fetch(SHEET_WEB_APP_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       action: "add",
-      data: {
-        studentId: studentId,
-        type: type,
-        points: pointsToAdd
-      }
+      data: { studentId, type, points: pointsToAdd }
     })
   }).catch(err => console.log("Error syncing points:", err));
   
-  // Also add to history
   const now = new Date();
   const timeStr = now.toLocaleString('en-GB', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
   
   fetch(SHEET_WEB_APP_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       action: "addHistory",
-      data: {
-        time: timeStr,
-        studentId: studentId,
-        type: type,
-        reason: reasonText,
-        points: pointsToAdd,
-        teacher: teacher
-      }
+      data: { time: timeStr, studentId, type, reason: reasonText, points: pointsToAdd, teacher }
     })
   }).catch(err => console.log("Error syncing history:", err));
 }
 
-// Manually sync from Google Sheets
 function syncFromSheets() {
   showMsg("Syncing from Google Sheets...", 'success');
   initFromGoogleSheets();
@@ -544,7 +507,6 @@ addBtn.onclick = () => {
   const pts = data[itemIdx].pts;
   const reasonText = data[itemIdx].text;
 
-  // Update local storage
   if(type === 'Tanbeeh') points[studentId].tanbeeh += pts;
   else points[studentId].tashjeeh += pts;
 
@@ -553,7 +515,6 @@ addBtn.onclick = () => {
   renderTable();
   showMsg(`${pts} pts (${type}) added for ${ (studentNames[studentId] || 'Student') .split(' ')[0]} by ${teacher}`);
   
-  // Sync to Google Sheets (ADD only)
   syncToGoogleSheets(studentId, type, pts, reasonText, teacher);
 
   teacherNameInput.value = '';
@@ -568,7 +529,6 @@ resetStudentBtn.onclick = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(points));
   renderTable();
   showMsg(`${studentNames[idx] || 'Student'} points reset locally (Google Sheets unchanged)`, 'warn');
-  // NO syncToGoogleSheets() here - Sheets keeps the data!
 };
 
 clearHistoryBtn.onclick = () => {
@@ -582,15 +542,17 @@ clearHistoryBtn.onclick = () => {
 };
 
 typeSelect.onchange = updateItems;
-showParentBtn.onclick = () => window.open(SHEET_WEB_APP_URL, '_blank');
 syncFromSheetsBtn.onclick = syncFromSheets;
 
-// Initialize on page load
+/* The Parent Sheet functionality is still fully available via this line (kept for future use or manual access) */
+const openParentSheet = () => window.open(SHEET_WEB_APP_URL, '_blank');
+
+/* Initialize */
 window.addEventListener('DOMContentLoaded', async () => {
   await loadStudentNames();
   populateStudents();
   updateItems();
-  initFromGoogleSheets(); // Load from Sheets first
+  initFromGoogleSheets();
   renderTable();
   renderHistory();
 });
